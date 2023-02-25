@@ -73,7 +73,7 @@ class _MyAppState extends State<MyApp> {
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: AndroidNotificationDetails(
         'default_channel_id',
-        'Default Channel',
+        'default_channel',
         importance: Importance.high,
         priority: Priority.high,
       ),
