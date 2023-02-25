@@ -11,7 +11,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   final fcmToken = await FirebaseMessaging.instance.getToken();
-  print(fcmToken);
+  // print(fcmToken);
   runApp(MyApp());
 }
 
@@ -134,10 +134,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter FCM Push Notification Demo',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Flutter FCM Push Notification Demo'),
+          title: const Text('덕영고등학교 시간표 알리미'),
         ),
         body: SafeArea(
           child: SingleChildScrollView(
