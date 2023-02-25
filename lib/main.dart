@@ -1,115 +1,168 @@
+import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:dyhsapp/firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  print(fcmToken);
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
 
-  // This widget is the root of your application.
+class _MyAppState extends State<MyApp> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  @override
+  void initState() {
+    super.initState();
+    _configureLocalNotifications();
+    _configureFirebaseListeners();
+  }
+
+  // 로컬 알림 초기화
+  void _configureLocalNotifications() {
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      iOS: IOSInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+      ),
+    );
+    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+  // Firebase 이벤트 리스너 초기화
+  void _configureFirebaseListeners() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      // 앱이 foreground 상태에서 푸시 알림을 수신하는 경우
+      _showNotification(message);
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      // 앱이 background 또는 terminated 상태에서 푸시 알림을 클릭하는 경우
+      _navigateToScreen(message);
+    });
+
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
+
+  // 백그라운드에서 FCM 메시지 처리
+  Future<void> _firebaseMessagingBackgroundHandler(
+      RemoteMessage message) async {
+    // 앱이 background 또는 terminated 상태에서 푸시 알림을 수신하는 경우
+    _showNotification(message);
+  }
+
+  // 로컬 알림 표시
+  void _showNotification(RemoteMessage message) async {
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: AndroidNotificationDetails(
+        'default_channel_id',
+        'Default Channel',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+      iOS: IOSNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+    );
+    await _flutterLocalNotificationsPlugin.show(
+      message.hashCode,
+      message.notification?.title,
+      message.notification?.body,
+      platformChannelSpecifics,
+      payload: message.data['data'],
+    );
+  }
+
+  // 화면 이동 처리
+  void _navigateToScreen(RemoteMessage message) {
+    // TODO: 알림 클릭 시 이동할 화면 구현
+  }
+
+  final _valueList = [
+    '1-1',
+    '1-2',
+    '1-3',
+    '1-4',
+    '1-5',
+    '1-6',
+    '1-7',
+    '1-8',
+    '1-9',
+    '1-10',
+    '2-1',
+    '2-2',
+    '2-3',
+    '2-4',
+    '2-5',
+    '2-6',
+    '2-7',
+    '2-8',
+    '2-9',
+    '2-10',
+    '3-1',
+    '3-2',
+    '3-3',
+    '3-4',
+    '3-5',
+    '3-6',
+    '3-7',
+    '3-8',
+    '3-9',
+    '3-10'
+  ];
+  var _selectedValue = '1-1';
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      title: 'Flutter FCM Push Notification Demo',
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Flutter FCM Push Notification Demo'),
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: _valueList.map((value) {
+                return CheckboxListTile(
+                  title: Text(value),
+                  value: _selectedValue == value,
+                  onChanged: (isChecked) async {
+                    if (isChecked != null) {
+                      await FirebaseMessaging.instance
+                          .unsubscribeFromTopic(_selectedValue);
+                      setState(() {
+                        _selectedValue = value;
+                      });
+                      await FirebaseMessaging.instance
+                          .subscribeToTopic(_selectedValue);
+                    }
+                  },
+                );
+              }).toList(),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
