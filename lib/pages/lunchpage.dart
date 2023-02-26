@@ -25,17 +25,17 @@ class LunchPage extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-    final DateTime now = DateTime.now();
+    // final DateTime now = DateTime.now();
     // final DateFormat formatter = DateFormat('yyyyMMdd');
     // final String date = formatter.format(now);
     // print(date); // something like 20130420
 
-    const String date = "20220321";
+    // const String date = "20220321";
 
-    final response = _callAPI(date);
-    final parsedJson = json.decode(response).cast<Map<String, dynamic>>();
-    print(parsedJson['mealServiceDietInfo'][1]['row']);
-    return Container();
+    // final response = _callAPI(date);
+    // final parsedJson = json.decode(response).cast<Map<String, dynamic>>();
+    // print(parsedJson['mealServiceDietInfo'][1]['row']);
+    return const Text("현재 개발 중인 페이지입니다.");
     // return Container(
     //     child: FutureBuilder(
     //         future: parsedJson["DDISH_NM"],
