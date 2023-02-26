@@ -163,6 +163,13 @@ class _MyAppState extends State<MyApp> {
                     });
                     await FirebaseMessaging.instance
                         .subscribeToTopic(_selectedValue);
+                    if (_selectedValue == "unused") {
+                      for (var i = 0; i <= 29; i++) {
+                        final untopic = _valueList[i];
+                        await FirebaseMessaging.instance
+                            .unsubscribeFromTopic(untopic);
+                      }
+                    }
                   }
                 },
               );

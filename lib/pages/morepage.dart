@@ -17,6 +17,8 @@ class MorePage extends StatelessWidget {
               child: Column(children: const [
             Text("현재 이 앱은 베타버전으로 많은 오류가 존재합니다."),
             SizedBox(height: 15),
+            Text("알림이 잘못 수신될 경우, unused를 선택 후 다시 선택해주세요."),
+            SizedBox(height: 15),
             Text("문의: support@suk.kr"),
             SizedBox(height: 15),
             Text("개발: https://suk.kr"),
