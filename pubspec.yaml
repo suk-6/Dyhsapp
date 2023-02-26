@@ -39,7 +39,6 @@ dependencies:
   flutter_local_notifications: ^9.1.5
   webview_flutter: ^3.0.4
   get: ^4.6.5
-  neis_api: ^0.0.5
   http: ^0.13.5
 
 dev_dependencies:
