@@ -1,9 +1,14 @@
 import 'dart:async';
+import 'package:dyhsapp/pages/comcigan.dart';
+import 'package:dyhsapp/pages/lunchpage.dart';
+import 'package:dyhsapp/pages/morepage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:dyhsapp/firebase_options.dart';
+import 'package:get/get.dart';
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -131,37 +136,57 @@ class _MyAppState extends State<MyApp> {
   ];
   var _selectedValue = '1-1';
 
+  final int _idx = 0;
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('덕영고등학교 시간표 알리미'),
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: _valueList.map((value) {
-                return CheckboxListTile(
-                  title: Text(value),
-                  value: _selectedValue == value,
-                  onChanged: (isChecked) async {
-                    if (isChecked != null) {
-                      await FirebaseMessaging.instance
-                          .unsubscribeFromTopic(_selectedValue);
-                      setState(() {
-                        _selectedValue = value;
-                      });
-                      await FirebaseMessaging.instance
-                          .subscribeToTopic(_selectedValue);
-                    }
-                  },
-                );
-              }).toList(),
-            ),
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    return GetMaterialApp(
+        home: Scaffold(
+      appBar: AppBar(
+        title: const Text('덕영고등학교 시간표 알리미'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: _valueList.map((value) {
+              return CheckboxListTile(
+                title: Text(value),
+                value: _selectedValue == value,
+                onChanged: (isChecked) async {
+                  if (isChecked != null) {
+                    await FirebaseMessaging.instance
+                        .unsubscribeFromTopic(_selectedValue);
+                    setState(() {
+                      _selectedValue = value;
+                    });
+                    await FirebaseMessaging.instance
+                        .subscribeToTopic(_selectedValue);
+                  }
+                },
+              );
+            }).toList(),
           ),
         ),
       ),
-    );
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.subscriptions_outlined), label: '시간표 구독'),
+          BottomNavigationBarItem(icon: Icon(Icons.timelapse), label: '컴시간'),
+          BottomNavigationBarItem(icon: Icon(Icons.lunch_dining), label: '급식'),
+          BottomNavigationBarItem(icon: Icon(Icons.more), label: '더보기'),
+        ],
+        onTap: (index) {
+          // _idx = index;
+          // print(_idx);
+          if (index == 1) Get.to(() => const Comcigan());
+          if (index == 2) Get.to(() => LunchPage());
+          if (index == 3) Get.to(() => const MorePage());
+        },
+        currentIndex: _idx,
+      ),
+    ));
   }
 }
