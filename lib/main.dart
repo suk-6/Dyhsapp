@@ -170,7 +170,8 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        // backgroundColor: Color.fromARGB(255, 49, 48, 48),
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.subscriptions_outlined), label: '시간표 구독'),
